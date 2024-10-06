@@ -14,9 +14,6 @@ class ktTest extends DuskTestCase
     public function testExample(): void
     {
         $this->browse(function (Browser $browser) {
-//            $browser->visit('https://www.kurtosys.com/white-papers/eu-rule-change-bolsters-need-for-fast-localized-fund-website-platforms-2/')
-//                    ->clickAtXPath("//button[@id='onetrust-accept-btn-handler']");
-//                    sleep(5);
 
             $browser->visit('https://kurtosys.com/')
                     ->waitForText('INSIGHTS', 5)
