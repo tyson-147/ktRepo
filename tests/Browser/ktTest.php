@@ -2,32 +2,48 @@
 
 namespace Tests\Browser;
 
-use Illuminate\Foundation\Testing\DatabaseMigrations;
+//use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Laravel\Dusk\Browser;
 use Tests\DuskTestCase;
+use Tests\Page_Elements\xpaths;
 
 class ktTest extends DuskTestCase
 {
-    /**
-     * A Dusk test example.
-     */
-    public function testExample(): void
+    private $pageElements;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->pageElements = new xpaths();
+    }
+
+    public function testKurtosys(): void
     {
         $this->browse(function (Browser $browser) {
 
-            $browser->visit('https://kurtosys.com/')
+            $browser->visit(ENV('URL'))
                     ->waitForText('INSIGHTS', 5)
-                    ->assertSee('INSIGHTS')
-                    ->mouseover(".kurtosys-menu-item:nth-child(3)")
-                    ->clickAtXPath("/html/body/div[1]/div/section[1]/div/div/div[1]/div/div/div[2]/div/div/div/div/ul/li[3]/div/div/div/div/section/div/div/div/div/div/div/div/ul/li[3]/a")
+                    ->mouseover($this->pageElements->insightsHeader)
+                    ->clickAtXPath($this->pageElements->whitePapeAndEbookMenu)
                     ->waitForText('UCITS White Paper')
-                    ->clickAtXPath('/html/body/div[2]/div/section[2]/div/div/div/div/div/div/div/div[1]/article[7]/div/div[1]/p/a')
+                    ->clickAtXPath($this->pageElements->UCITSwhitePaper)
                     ->waitForText('Accept All Cookies', 10)
-                    ->clickAtXPath("//button[@id='onetrust-accept-btn-handler']");
+                    ->clickAtXPath($this->pageElements->acceptCookiesButton);
 
             $browser->driver->switchTo()->frame(0);
-            $browser->clickAtXPath('//*[@id="pardot-form"]/p[2]/input');
-            sleep(1000);
+
+            $browser->waitForText('First Name', 5)
+                     ->assertDontSee("This field is required")
+                     ->type($this->pageElements->firstNameXpathInputValue, ENV('FIRST_NAME'))
+                     ->type($this->pageElements->lastNameXpathInputValue, ENV('LAST_NAME'))
+                     ->type($this->pageElements->companyNameXpathInputValue, ENV('COMPANY_NAME'))
+                     ->type($this->pageElements->industryNameXpathInputValue, ENV('INDUSTRY_NAME'))
+                     ->clickAtXPath($this->pageElements->sendMeCopyButton)
+                     ->waitForText('This field is required.', 5)
+                     ->screenshot("Error_Message")
+                     ->assertSee("This field is required");
+
+            sleep(5);
             $browser->driver->switchTo()->defaultContent();
         });
     }
